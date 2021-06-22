@@ -1,0 +1,48 @@
+version: '2.2'
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - '80:8080'
+      - '443:8443'  #tcp port mapping
+      - '50000:50000' # api port mapping
+    volumes:
+      - 'C:\Users\souvi\Docker_Volume\jenkins-data:/var/jenkins_home'
+
+  selenium-hub:
+    restart: always
+    image: selenium/hub:latest
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+  #selenium-chrome
+  selenium-chrome:
+    restart: always
+    image: selenium/node-chrome-debug:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5900
+    depends_on:
+      - selenium-hub
+    environment:
+      HUB_HOST: selenium-hub
+      HUB_PORT: 4444
+
+  #selenium-firefox
+  selenium-firefox:
+    restart: always
+    image: selenium/node-firefox-debug:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5900
+    environment:
+      HUB_HOST: selenium-hub
+      HUB_PORT: 4444
+
+volumes:
+  jenkins_data:
+
